@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ProTech | بيع وصيانة ماكينات الطباعة وتوريد الأحبار</title>
+<meta name="description" content="ProTech لبيع وصيانة ماكينات الطباعة الرقمية وتوريد الأحبار الأصلية، بخبرة أكثر من 25 عام ودعم فني على مدار الساعة.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&family=Tajawal:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<!-- البار العلوي (بيتملي من إعدادات الأدمن) -->
+<div class="topbar" id="topbar" style="display:none">
+    <div class="topbar-status"></div>
+    <div class="topbar-hours"></div>
+</div>
+
+<!-- الهيدر -->
+<header id="siteHeader">
+    <a class="logo" href="#/home">Pro<span>Tech</span></a>
+
+    <nav class="nav-icons" id="mainNav">
+        <button data-route="home" class="nav-btn"><i class="fa-solid fa-house"></i><span data-i18n="nav_home">الرئيسية</span></button>
+        <button data-route="machines" class="nav-btn"><i class="fa-solid fa-print"></i><span data-i18n="nav_machines">المكن</span></button>
+        <button data-route="store" class="nav-btn"><i class="fa-solid fa-droplet"></i><span data-i18n="nav_store">المتجر</span></button>
+        <button data-route="team" class="nav-btn"><i class="fa-solid fa-users-gear"></i><span data-i18n="nav_team">الفريق</span></button>
+        <button data-route="settings" class="nav-btn"><i class="fa-solid fa-gears"></i><span data-i18n="nav_settings">الإعدادات</span></button>
+    </nav>
+
+    <div class="header-actions">
+        <button class="cart-trigger-btn" onclick="openCartModal()">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span data-i18n="mp_cart">السلة</span>
+            <span class="cart-badge" id="cart-count">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" aria-label="فتح القائمة"><i class="fa-solid fa-bars"></i></button>
+    </div>
+</header>
+
+<!-- البانل الجانبي في الموبايل -->
+<div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="if(event.target===this) closeMobilePanel()">
+    <div class="mobile-panel">
+        <div class="mp-header">
+            <div class="logo">Pro<span>Tech</span></div>
+            <button class="mp-close" onclick="closeMobilePanel()">&times;</button>
+        </div>
+        <div class="mp-body">
+            <div class="mp-section">
+                <div class="mp-nav">
+                    <button data-route="home" onclick="closeMobilePanel()"><i class="fa-solid fa-house"></i><span data-i18n="nav_home">الرئيسية</span></button>
+                    <button data-route="machines" onclick="closeMobilePanel()"><i class="fa-solid fa-print"></i><span data-i18n="nav_machines">المكن</span></button>
+                    <button data-route="store" onclick="closeMobilePanel()"><i class="fa-solid fa-droplet"></i><span data-i18n="nav_store">المتجر</span></button>
+                    <button data-route="team" onclick="closeMobilePanel()"><i class="fa-solid fa-users-gear"></i><span data-i18n="nav_team">الفريق</span></button>
+                    <button data-route="settings" onclick="closeMobilePanel()"><i class="fa-solid fa-gears"></i><span data-i18n="nav_settings">الإعدادات</span></button>
+                </div>
+            </div>
+            <div class="mp-section">
+                <div class="mp-toggle-row">
+                    <span><i class="fa-solid fa-moon"></i> <span data-i18n="mp_dark_mode">الوضع الليلي</span></span>
+                    <button class="mp-switch theme-switch" onclick="toggleTheme()"></button>
+                </div>
+            </div>
+            <div class="mp-section">
+                <div class="mp-section-title" data-i18n="mp_language">اللغة</div>
+                <div class="mp-lang-options">
+                    <button class="mp-lang-btn active" data-lang="ar" onclick="setLanguage('ar')">العربية</button>
+                    <button class="mp-lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
+                    <button class="mp-lang-btn" disabled title="قريبًا">中文</button>
+                </div>
+            </div>
+            <div class="mp-section">
+                <div class="mp-section-title" data-i18n="mp_quick_actions">وصول سريع</div>
+                <div class="mp-quick-actions">
+                    <button onclick="closeMobilePanel(); openCartModal()"><i class="fa-solid fa-cart-shopping"></i> <span data-i18n="mp_cart">السلة</span> <span class="badge-mini" id="cart-count-mp">0</span></button>
+                    <button onclick="closeMobilePanel(); openConsultationModal()"><i class="fa-brands fa-whatsapp"></i> <span data-i18n="mp_whatsapp">تواصل واتساب</span></button>
+                    <button onclick="closeMobilePanel(); openMaintenanceModal()"><i class="fa-solid fa-screwdriver-wrench"></i> <span data-i18n="mp_maintenance">اطلب صيانة</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- شريط التنقل السفلي في الموبايل -->
+<nav class="mobile-tabbar">
+    <div class="tab-inner">
+        <button data-route="home"><i class="fa-solid fa-house"></i>الرئيسية</button>
+        <button data-route="machines"><i class="fa-solid fa-print"></i>المكن</button>
+        <button data-route="store"><i class="fa-solid fa-droplet"></i>المتجر</button>
+        <button data-route="team"><i class="fa-solid fa-users-gear"></i>الفريق</button>
+        <button data-route="settings"><i class="fa-solid fa-gears"></i>الإعدادات</button>
+    </div>
+</nav>
+
+<main>
+
+<!-- ====================================================== -->
+<!-- ===================== الرئيسية ======================= -->
+<!-- ====================================================== -->
+<div class="view" id="view-home">
+    <section class="hero">
+        <div class="hero-slides" id="heroSlides">
+            <div class="hero-slide active slide-pattern" id="heroSlideMain" style="background-image:linear-gradient(0deg, rgba(10,20,32,.78), rgba(10,20,32,.35)), url('صور/WhatsApp  2026-08-09 at 2.35.41 PM.jpeg')">
+                <span class="slide-caption" id="slideCaption1"></span>
+            </div>
+            <div class="hero-slide slide-pattern slide-pattern-2" id="heroSlide2"><span class="slide-caption" id="slideCaption2"></span></div>
+            <div class="hero-slide slide-pattern slide-pattern-3" id="heroSlide3"><span class="slide-caption" id="slideCaption3"></span></div>
+        </div>
+
+        <div class="hero-content reveal">
+            <span class="eyebrow" data-i18n="hero_eyebrow">ProTech · بيع وصيانة وأحبار أصلية</span>
+            <h1 id="heroTitle" data-i18n="hero_title">خبرة أكتر من <span class="mono-accent">25</span> عام في صيانة وتوريد ماكينات الطباعة</h1>
+            <p id="heroDesc" data-i18n="hero_desc">بيع ماكينات طباعة رقمية، صيانة ودعم فني متكامل، وتوريد أحبار وتونر أصلي لكل الأنواع — بضمان حقيقي ومتابعة لحد ما تشتغل الماكينة تمام.</p>
+            <div class="hero-actions">
+                <a href="#/store" class="btn btn-primary"><i class="fa-solid fa-cart-shopping"></i> <span data-i18n="hero_cta_shop">تسوق الأحبار الآن</span></a>
+                <button class="btn btn-ghost" onclick="openConsultationModal()"><i class="fa-solid fa-headset"></i> <span data-i18n="hero_cta_consult">اطلب استشارة فنية</span></button>
+            </div>
+        </div>
+
+        <div class="hero-slide-controls">
+            <button class="slide-dot active" data-slide="0"></button>
+            <button class="slide-dot" data-slide="1"></button>
+            <button class="slide-dot" data-slide="2"></button>
+        </div>
+    </section>
+
+    <section class="stats-strip reveal">
+        <div class="stat-box"><h3 class="counter" data-target="500">0</h3><p>ماكينة تم تركيبها وصيانتها</p></div>
+        <div class="stat-box"><h3 class="counter" data-target="25">0</h3><p>سنوات خبرة رائدة</p></div>
+        <div class="stat-box"><h3 class="counter" data-target="368">0</h3><p>عميل راضٍ وشركاء نجاح</p></div>
+        <div class="stat-box"><h3 class="counter" data-target="24">0</h3><p>ساعة دعم فني متواصل</p></div>
+    </section>
+
+    <!-- إعلانات وعروض (من الأدمن — بتتخفي لوحدها لو مفيش عروض) -->
+    <div class="ads-strip" id="adsStrip" style="display:none"></div>
+
+    <section class="section">
+        <div class="section-head reveal">
+            <span class="eyebrow">وصول سريع</span>
+            <h2 data-i18n="quick_title">محتاج إيه دلوقتي؟</h2>
+        </div>
+        <div class="quick-grid reveal">
+            <a href="#/store" class="quick-card ink-c">
+                <div class="quick-icon"><i class="fa-solid fa-droplet"></i></div>
+                <h3 data-i18n="quick_inks">الأحبار</h3>
+                <p>أحبار برازيلي أصلية</p>
+                <span class="quick-go">اذهب للمتجر <i class="fa-solid fa-arrow-left"></i></span>
+            </a>
+            <a href="#/machines" class="quick-card ink-m">
+                <div class="quick-icon"><i class="fa-solid fa-print"></i></div>
+                <h3 data-i18n="quick_machines">الماكينات</h3>
+                <p>أحدث ماكينات الطباعة الرقمية المتاحة</p>
+                <span class="quick-go">تصفح الماكينات <i class="fa-solid fa-arrow-left"></i></span>
+            </a>
+            <button class="quick-card ink-y" onclick="openMaintenanceModal()">
+                <div class="quick-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                <h3 data-i18n="quick_maintenance">اطلب صيانة</h3>
+                <p>هنرد عليك بسرعة عبر واتساب</p>
+                <span class="quick-go">اطلب الآن <i class="fa-solid fa-arrow-left"></i></span>
+            </button>
+            <a href="#/store/parts" class="quick-card ink-k">
+                <div class="quick-icon"><i class="fa-solid fa-gears"></i></div>
+                <h3 data-i18n="quick_parts">قطع الغيار</h3>
+                <p>أجود أنواع قطع الغيار</p>
+                <span class="quick-go">شاهد قطع الغيار المتوفرة <i class="fa-solid fa-arrow-left"></i></span>
+            </a>
+        </div>
+    </section>
+
+    <section class="section section-dark">
+        <div class="section-head reveal">
+            <span class="eyebrow">خدماتنا</span>
+            <h2 data-i18n="services_title">كل احتياجاتك تحت سقف واحد</h2>
+        </div>
+        <div class="services-grid reveal">
+            <div class="service-card">
+                <i class="fa-solid fa-computer"></i>
+                <h3>بيع الماكينات</h3>
+                <p>ماكينات طباعة رقمية جديدة ومستعملة مضمونة، مع تركيب وتشغيل كامل في مكانك.</p>
+                <a href="https://wa.me/201000000000?text=%D8%B9%D8%A7%D9%88%D8%B2%20%D8%A7%D8%B3%D8%A3%D9%84%20%D8%B9%D9%86%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D9%85%D8%A7%D9%83%D9%8A%D9%86%D8%A9" target="_blank" data-wa="phone1">اسأل عن السعر <i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+            <div class="service-card">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+                <h3>الصيانة والدعم الفني</h3>
+                <p>عقود صيانة دورية أو زيارة فردية، بفريق مهندسين معتمدين وقطع غيار أصلية.</p>
+                <a href="https://wa.me/201000000000?text=%D8%B9%D8%A7%D9%88%D8%B2%20%D8%A3%D8%B7%D9%84%D8%A8%20%D8%B5%D9%8A%D8%A7%D9%86%D8%A9" target="_blank" data-wa="phone1">اطلب صيانة <i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+            <div class="service-card">
+                <i class="fa-solid fa-droplet"></i>
+                <h3>توريد الأحبار والتونر</h3>
+                <p>أحبار أصلية ومتوافقة عالية الجودة، بأسعار جملة ومفرد وتوصيل سريع.</p>
+                <a href="#/store">تصفح المتجر <i class="fa-solid fa-arrow-left"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-head reveal">
+            <span class="eyebrow">ثقة عملائنا</span>
+            <h2>وكلاؤنا وشهادات خبرة</h2>
+        </div>
+        <div class="gallery-track reveal" id="galleryTrack">
+            <p style="color:var(--muted);padding:16px 4px;font-size:13.5px">جاري تحميل الشهادات...</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-head reveal">
+            <span class="eyebrow">مش فاهم حاجة؟</span>
+            <h2 data-i18n="faq_title">أسئلة شائعة</h2>
+        </div>
+        <div class="faq-list reveal">
+            <div class="faq-item"><button class="faq-q">إزاي أقدر أطلب صيانة؟ <i class="fa-solid fa-chevron-down"></i></button><div class="faq-a"><p>اضغط على زرار "اطلب صيانة" في الصفحة الرئيسية، أو زرار الاستشارة الفنية أسفل الشاشة، وهيوصلنا طلبك مباشرة على واتساب.</p></div></div>
+            <div class="faq-item"><button class="faq-q">هل فيه ضمان على الماكينات والقطع؟ <i class="fa-solid fa-chevron-down"></i></button><div class="faq-a"><p>أيوه، كل الماكينات والقطع اللي بنوردها ليها ضمان، ومدته بتختلف حسب نوع الماكينة والقطعة.</p></div></div>
+            <div class="faq-item"><button class="faq-q">الأحبار عندكم أصلية ولا متوافقة؟ <i class="fa-solid fa-chevron-down"></i></button><div class="faq-a"><p>بنوفر النوعين — أحبار أصلية Original، وأحبار متوافقة عالية الجودة لمن يفضل توفير التكلفة.</p></div></div>
+            <div class="faq-item"><button class="faq-q">بتوصلوا فين؟ <i class="fa-solid fa-chevron-down"></i></button><div class="faq-a"><p>بنخدم القاهرة الكبرى ومعظم المحافظات، وبنتفق على تفاصيل التوصيل والصيانة حسب موقعك.</p></div></div>
+        </div>
+    </section>
+</div>
+
+<!-- ====================================================== -->
+<!-- ====================== المكن ========================= -->
+<!-- ====================================================== -->
+<div class="view" id="view-machines">
+    <div class="breadcrumb" id="machinesCrumb"></div>
+    <div class="page-hero">
+        <div class="page-hero-inner" id="machinesHero">
+            <span class="eyebrow">المكن</span>
+            <h1 id="machinesTitle">ماكينات الطباعة</h1>
+            <p id="machinesDesc">اختار نوع الماكينة والماركة وشوف الموديلات المتاحة.</p>
+        </div>
+    </div>
+    <div class="store-tabs hidden" id="machinesTabs"></div>
+    <div class="cat-grid" id="machinesCats"></div>
+    <div class="inks-grid hidden" id="machinesItems"></div>
+</div>
+
+<!-- ====================================================== -->
+<!-- ====================== المتجر ======================== -->
+<!-- ====================================================== -->
+<div class="view" id="view-store">
+    <div class="breadcrumb"><a href="#/home">الرئيسية</a> / <b>المتجر</b></div>
+    <div class="page-hero">
+        <div class="page-hero-inner" id="storeHero">
+            <span class="eyebrow">المتجر</span>
+            <h1 id="storeHeroTitle">قسم الأحبار والمواد الاستهلاكية</h1>
+            <p id="storeHeroDesc">استعرض أجود أنواع الأحبار الأصلية المعتمدة والتونر، بأسعار جملة ومفرد وتوصيل سريع.</p>
+        </div>
+    </div>
+    <div class="list-toolbar"><h2 id="storeTitle">المنتجات المتاحة</h2><span id="storeMeta"></span></div>
+    <div class="store-tabs">
+        <button class="store-tab active" data-bucket="inks" onclick="location.hash='#/store/inks'"><i class="fa-solid fa-droplet"></i> الأحبار</button>
+        <button class="store-tab" data-bucket="machines" onclick="location.hash='#/store/machines'"><i class="fa-solid fa-print"></i> المكن</button>
+        <button class="store-tab" data-bucket="parts" onclick="location.hash='#/store/parts'"><i class="fa-solid fa-gears"></i> قطع الغيار</button>
+    </div>
+    <div class="inks-grid" id="storeItems"></div>
+    <div class="parts-grid hidden" id="partsContainer"></div>
+</div>
+
+<!-- ====================================================== -->
+<!-- ================== تفاصيل المنتج ===================== -->
+<!-- ====================================================== -->
+<div class="view" id="view-product">
+    <div class="details-wrap">
+        <button class="back-btn" onclick="goBack()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+        <div id="detailsContent"></div>
+    </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- ====================== الفريق ======================== -->
+<!-- ====================================================== -->
+<div class="view" id="view-team">
+    <div class="breadcrumb"><a href="#/home">الرئيسية</a> / <b>الفريق</b></div>
+    <div class="page-hero">
+        <div class="page-hero-inner" id="teamHero">
+            <span class="eyebrow">فريق العمل</span>
+            <h1 id="teamTitle">تعرّف على فريقنا</h1>
+            <p id="teamDesc">مهندسين وفنيين بخبرة طويلة جاهزين لمساعدتك في أي وقت.</p>
+        </div>
+    </div>
+    <div class="team-grid" id="teamGrid"></div>
+</div>
+
+<!-- ====================================================== -->
+<!-- ==================== الإعدادات ======================= -->
+<!-- ====================================================== -->
+<div class="view" id="view-settings">
+    <div class="breadcrumb"><a href="#/home">الرئيسية</a> / <b>الإعدادات</b></div>
+    <div class="settings-wrap">
+
+        <div class="settings-card">
+            <h3><i class="fa-solid fa-user"></i> حسابي</h3>
+
+            <div id="loggedOutView">
+                <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+                    تسجيل الدخول اختياري تمامًا — هتحتاجه بس لو حابب تسجل إعجاب بمنتج أو ماكينة، عشان نفتكرلك إعجاباتك.
+                </p>
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+                    <button class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">حساب جديد</button>
+                </div>
+
+                <form class="auth-form" id="loginForm" onsubmit="return doLogin(event)">
+                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
+                    <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
+                    <button type="submit" class="btn btn-primary" style="justify-content:center"><i class="fa-solid fa-right-to-bracket"></i> دخول</button>
+                    <a onclick="return forgotPassword()" style="cursor:pointer;color:var(--cyan);font-size:12.5px;font-weight:700;text-align:center">نسيت كلمة المرور؟</a>
+                    <div class="auth-error" id="loginError"></div>
+                </form>
+
+                <form class="auth-form hidden" id="signupForm" onsubmit="return doSignup(event)">
+                    <input type="email" id="signupEmail" placeholder="البريد الإلكتروني" required>
+                    <input type="tel" id="signupPhone" placeholder="رقم الهاتف (اختياري)">
+                    <input type="password" id="signupPassword" placeholder="كلمة مرور (٦ أحرف على الأقل)" required minlength="6">
+                    <button type="submit" class="btn btn-primary" style="justify-content:center"><i class="fa-solid fa-user-plus"></i> إنشاء حساب</button>
+                    <div class="auth-error" id="signupError"></div>
+                </form>
+            </div>
+
+            <div id="loggedInView" class="hidden">
+                <div class="account-status">
+                    <div class="who"><i class="fa-solid fa-circle-user"></i> <span id="currentUserEmail"></span></div>
+                    <button class="btn btn-outline" onclick="doLogout()" style="padding:8px 16px;font-size:13px">تسجيل خروج</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h3><i class="fa-solid fa-sliders"></i> تفضيلات الموقع</h3>
+            <div class="settings-row">
+                <span><i class="fa-solid fa-moon"></i> الوضع الليلي</span>
+                <button class="mp-switch theme-switch" onclick="toggleTheme()"></button>
+            </div>
+            <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:10px">
+                <span><i class="fa-solid fa-language"></i> اللغة</span>
+                <div class="lang-grid">
+                    <button class="lang-choice active" data-lang="ar" onclick="setLanguage('ar')">العربية</button>
+                    <button class="lang-choice" data-lang="en" onclick="setLanguage('en')">English</button>
+                    <button class="lang-choice" disabled title="قريبًا">中文 (قريبًا)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h3><i class="fa-solid fa-heart"></i> إعجاباتي</h3>
+            <div id="myLikesBox"><p class="empty-hint">سجّل دخولك عشان تشوف المنتجات والماكينات اللي عجبتك.</p></div>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<!-- فوتر -->
+<footer class="site-footer">
+    <div class="footer-top">
+        <div class="footer-brand">Pro<span>Tech</span></div>
+        <div class="footer-social" id="footerSocial">
+            <a href="https://wa.me/201000000000" target="_blank" data-wa="phone1"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="mailto:info@protech.com"><i class="fa-solid fa-envelope"></i></a>
+            <a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+        </div>
+    </div>
+    <p class="footer-copy">© 2026 ProTech — جميع الحقوق محفوظة</p>
+</footer>
+
+<!-- زر الاستشارة الدائم -->
+<button class="consultation-trigger" onclick="openConsultationModal()"><i class="fa-solid fa-headset"></i> استشارة فنية</button>
+
+<!-- نافذة الاستشارة -->
+<div id="consultationModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeConsultationModal()">&times;</button>
+        <h3><i class="fa-solid fa-headset"></i> اختر رقم للتواصل عبر الواتساب</h3>
+        <p>فريق الدعم الفني جاهز للإجابة على استفساراتك:</p>
+        <div id="consultationNumbersList">
+            <a class="wa-choice" href="https://wa.me/201000000000" target="_blank" data-wa="phone1"><i class="fa-brands fa-whatsapp"></i> تواصل مع المهندس الأول</a>
+            <a class="wa-choice" href="https://wa.me/201111111111" target="_blank" data-wa="phone2"><i class="fa-brands fa-whatsapp"></i> تواصل مع المهندس الثاني</a>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة طلب الصيانة -->
+<div id="maintenanceModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeMaintenanceModal()">&times;</button>
+        <h3><i class="fa-solid fa-screwdriver-wrench"></i> اطلب صيانة الآن</h3>
+        <p>املأ البيانات دي وهيتفتحلك واتساب برسالة جاهزة نبعتها للأدمن مباشرة.</p>
+        <form id="maintenanceForm" onsubmit="return sendMaintenanceRequest(event)">
+            <label>اسمك<input type="text" name="customerName" placeholder="الاسم بالكامل" required></label>
+            <label>نوع الماكينة<input type="text" name="machine" placeholder="مثال: طابعة ليزر ملونة" required></label>
+            <label>وصف المشكلة<textarea name="issue" rows="3" placeholder="اكتب المشكلة باختصار" required></textarea></label>
+            <label>رقم التليفون<input type="tel" name="phone" placeholder="01xxxxxxxxx" required></label>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center"><i class="fa-brands fa-whatsapp"></i> إرسال الطلب عبر واتساب</button>
+        </form>
+    </div>
+</div>
+
+<!-- نافذة السلة -->
+<div id="cartModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeCartModal()">&times;</button>
+        <h3><i class="fa-solid fa-file-invoice"></i> فاتورة سلة المشتريات</h3>
+        <div id="cartItemsContainer" class="cart-items"></div>
+        <div class="cart-total"><span>الإجمالي الكلي:</span><span id="cartTotalPrice">0 ج.م</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+            <input type="text" id="cartCustomerName" class="cart-field" placeholder="اسمك بالكامل">
+            <input type="tel" id="cartCustomerPhone" class="cart-field" placeholder="رقم تليفونك">
+        </div>
+        <div id="paymentMethodBox" style="margin-bottom:14px"></div>
+        <div class="cart-actions">
+            <button onclick="downloadInvoice()" class="btn-action btn-blue"><i class="fa-solid fa-download"></i> تنزيل الفاتورة</button>
+            <button onclick="checkoutToWhatsApp()" class="btn-action btn-green"><i class="fa-brands fa-whatsapp"></i> إتمام الشراء</button>
+            <button onclick="clearCart()" class="btn-action" style="background:#e5484d"><i class="fa-solid fa-trash"></i> مسح السلة</button>
+        </div>
+    </div>
+</div>
+
+<!-- الصورة المكبرة -->
+<div id="myLightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="close-btn">&times;</span>
+    <img id="lightboxImg" src="" alt="صورة مكبرة">
+</div>
+
+<div id="siteToast"></div>
+
+<script src="firebase.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
