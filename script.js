@@ -105,7 +105,7 @@ function goToSlide(i) {
   currentSlide = i;
   heroSlides[currentSlide]?.classList.add('active'); slideDots[currentSlide]?.classList.add('active');
 }
-let slideTimer = setInterval(() => goToSlide((currentSlide + 1) % heroSlides.length), 4500);
+let slideTimer = heroSlides.length < 2 ? null : setInterval(() => goToSlide((currentSlide + 1) % heroSlides.length), 4500);
 slideDots.forEach((dot, i) => dot.addEventListener('click', () => {
   clearInterval(slideTimer); goToSlide(i);
   slideTimer = setInterval(() => goToSlide((currentSlide + 1) % heroSlides.length), 4500);
@@ -467,16 +467,10 @@ function renderHome() {
         <span class="cap">${esc(c.title || '')}</span></div>`).join('')
     : '<p style="color:var(--muted);padding:16px 4px;font-size:13.5px">لا توجد شهادات مضافة بعد.</p>';
 
-  // بانر الرئيسية (عنوان/وصف/٣ صور بتعليقاتها)
+  // بانر الرئيسية: صورة واحدة بس (من لوحة التحكم)
   const b = byCat('banner_index')[0];
-  if (b) {
-    if (b.title) { $('heroTitle').textContent = b.title; $('heroTitle').dataset.custom = '1'; }
-    if (b.desc) { $('heroDesc').textContent = b.desc; $('heroDesc').dataset.custom = '1'; }
-    const slideEls = [$('heroSlideMain'), $('heroSlide2'), $('heroSlide3')];
-    [b.imageUrl, b.image2, b.image3].forEach((url, i) => {
-      if (url && slideEls[i]) slideEls[i].style.backgroundImage = `linear-gradient(0deg, rgba(10,20,32,.78), rgba(10,20,32,.35)), url('${url}')`;
-    });
-    [b.caption1, b.caption2, b.caption3].forEach((cap, i) => { if (cap) $(`slideCaption${i + 1}`).textContent = cap; });
+  if (b && b.imageUrl && $('heroSlideMain')) {
+    $('heroSlideMain').style.backgroundImage = `url('${b.imageUrl}')`;
   }
 }
 
