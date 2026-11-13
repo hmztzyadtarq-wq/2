@@ -136,35 +136,19 @@ header.scrolled{ box-shadow:var(--shadow-sm); }
   display:flex; align-items:center; justify-content:center;
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero (بانر صورة واحدة) ---------- */
 .hero{
-  position:relative; min-height:78vh;
-  display:flex; align-items:flex-end;
-  overflow:hidden;
-  background:var(--key);
+  position:relative; width:100%;
+  height:clamp(220px, 34vw, 420px);
+  overflow:hidden; background:var(--key);
 }
 .hero-slides{ position:absolute; inset:0; }
 .hero-slide{
-  position:absolute; inset:0; background-size:cover; background-position:center;
-  opacity:0; transition:opacity 1.2s ease;
+  position:absolute; inset:0;
+  background-repeat:no-repeat; background-size:cover; background-position:center 30%;
+  opacity:0; transition:opacity .6s ease;
 }
 .hero-slide.active{ opacity:1; }
-.slide-caption{
-  position:absolute; bottom:90px; inset-inline-start:32px; z-index:1;
-  color:#fff; font-family:var(--font-mono); font-size:13px; background:rgba(10,20,32,.55);
-  padding:6px 14px; border-radius:999px; display:none;
-}
-.slide-caption:not(:empty){ display:inline-block; }
-.slide-pattern{
-  background:
-    radial-gradient(circle, rgba(255,255,255,.10) 1.6px, transparent 1.6px) 0 0/22px 22px,
-    linear-gradient(160deg, #0E1B2B, #1B2E45);
-}
-.slide-pattern-3{
-  background:
-    radial-gradient(circle, rgba(255,255,255,.10) 1.6px, transparent 1.6px) 0 0/22px 22px,
-    linear-gradient(200deg, #14283d, #0b1622);
-}
 
 /* علامات التسجيل الطباعية — لمسة الهوية */
 .hero-dots-mark{
@@ -584,7 +568,7 @@ html[dir="ltr"] .mobile-panel{ inset-inline-end:auto; inset-inline-start:0; tran
   body{ padding-bottom:64px; }
   .consultation-trigger{ bottom:76px; }
   .topbar{ font-size:11px; }
-  .hero-content{ padding-bottom:50px; }
+  .hero{ height:clamp(190px, 52vw, 260px); }
 }
 
 
